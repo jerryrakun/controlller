@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Robot Control | Orientation Locked</title>
     <style>
         :root {
@@ -31,13 +31,13 @@
             box-sizing: border-box;
         }
 
-        /* ROTATION OVERLAY (Hidden by default) */
+        /* ROTATION OVERLAY */
         #rotation-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-dark);
-            z-index: 1000;
-            display: none; /* Controlled by JS */
+            z-index: 2000; /* Higher z-index to ensure it is on top */
+            display: none; 
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -46,8 +46,7 @@
         }
 
         .rotate-icon {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             border: 5px solid var(--accent-blue);
             border-radius: 15px;
             margin-bottom: 20px;
@@ -195,6 +194,21 @@
         }
         #status-text { color: var(--accent-blue); font-size: 1rem; font-weight: bold; text-transform: uppercase; }
         .highlight { color: var(--accent-green); }
+
+        /* MOBILE RESPONSIVENESS */
+        @media (max-width: 768px) {
+            .console-container {
+                flex-direction: column;
+                gap: 40px;
+                padding: 30px;
+                border-radius: 40px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .btn-move { width: 70px; height: 70px; }
+            .btn-action { width: 130px; height: 60px; }
+            .btn-sequence { width: 270px; height: 60px; }
+        }
     </style>
 </head>
 <body onload="checkOrientation()">
@@ -202,8 +216,8 @@
     <!-- ORIENTATION OVERLAY -->
     <div id="rotation-overlay">
         <div class="rotate-icon"></div>
-        <h2>Please Rotate Your Device</h2>
-        <p>This controller requires Landscape Mode to function.</p>
+        <h2 style="color:white">Please Rotate Your Device</h2>
+        <p style="color:#94a3b8">This controller requires Landscape Mode to function.</p>
     </div>
 
     <div class="bg-triangle tri-blue"></div>
@@ -269,21 +283,24 @@
     </div>
 
     <script>
-        // ORIENTATION DETECTION LOGIC
         function checkOrientation() {
             const overlay = document.getElementById('rotation-overlay');
             
             function updateOrientation() {
-                // Only show overlay if the device is a mobile device AND in portrait mode
-                if (window.innerWidth < window.innerHeight && window.innerWidth < 768) {
+                // A more robust way to check for portrait on mobile
+                const isPortrait = window.innerHeight > window.innerWidth;
+                const isMobile = window.innerWidth < 1024;
+
+                if (isPortrait && isMobile) {
                     overlay.style.display = 'flex';
                 } else {
                     overlay.style.display = 'none';
                 }
             }
 
-            // Listen for screen resizing or rotation
+            // Listen for resize and orientation changes
             window.addEventListener('resize', updateOrientation);
+            window.addEventListener('orientationchange', updateOrientation);
             updateOrientation();
         }
 
